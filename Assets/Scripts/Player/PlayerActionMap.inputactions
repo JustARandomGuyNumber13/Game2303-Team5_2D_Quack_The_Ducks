@@ -101,6 +101,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Other",
+            "id": "adba23bd-f76a-4df7-876e-fcb4596b122b",
+            "actions": [
+                {
+                    "name": "ToggleSettingMenu",
+                    "type": "Button",
+                    "id": "4bbaa58d-81f5-48aa-b8b4-b820a2c5b9eb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b1fac70e-ccde-4e21-b530-9a29aa18e9e0",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleSettingMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
