@@ -16,3 +16,4 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 8
   attackCooldown: 0.3
+  accelerationSpeed: 10
