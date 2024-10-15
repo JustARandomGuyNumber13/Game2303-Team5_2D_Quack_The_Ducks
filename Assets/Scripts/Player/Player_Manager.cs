@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player_Manager : MonoBehaviour
+public class Player_Behavior : MonoBehaviour
 {
     [SerializeField] private Player_Stat _stat;
     [SerializeField] private Animator _anim;
@@ -29,9 +29,6 @@ public class Player_Manager : MonoBehaviour
     private void Update()
     {
         _attackCoolDown += Time.deltaTime;
-    }
-    private void FixedUpdate()
-    {
         Move();
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -44,10 +41,10 @@ public class Player_Manager : MonoBehaviour
         Gizmos.DrawRay(transform.position, Vector2.down * _groundCheckDistance); // Ground check ray
     }
 
+
     /* Movement handlers */
     private void Move()
     {
-        //_rb.velocity += Vector2.right * _moveInput * _stat._moveSpeed * Time.fixedDeltaTime;
         float xSpeed = Mathf.MoveTowards(_rb.velocity.x, _stat._moveSpeed * _moveInput, _stat._accelerationSpeed * Time.fixedDeltaTime);
         _rb.velocity = new Vector2(xSpeed, _rb.velocity.y);
     }

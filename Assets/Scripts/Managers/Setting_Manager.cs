@@ -6,18 +6,19 @@ using UnityEngine.UI;
 
 public class Setting_Manager : MonoBehaviour
 {
-    private static GameObject SETTING_MANAGER;
+    private static Setting_Manager SETTING_MANAGER;
     [SerializeField] private GameObject _settingMenuCanvas;
     [SerializeField] private AudioMixer _mixer;
     [SerializeField] private AudioSource _bgm;
     [SerializeField] Slider _bgmVolumeSlider;
     [SerializeField] Slider _sfxVolumeSlider;
 
+
     private void Awake()
     {
         if (SETTING_MANAGER == null)
         {
-            SETTING_MANAGER = this.gameObject;
+            SETTING_MANAGER = this;
             DontDestroyOnLoad(SETTING_MANAGER);
         }
         else
@@ -34,6 +35,12 @@ public class Setting_Manager : MonoBehaviour
     /* Controlable in UI methods */
     public void ToggleSettingMenu(bool value)
     {
+        if (SETTING_MANAGER != null && SETTING_MANAGER != this) // Trick to call this method as a prefab component
+        { 
+            SETTING_MANAGER.ToggleSettingMenu(value);
+            return;
+        }
+
         _settingMenuCanvas.SetActive(value);
         if (value)
         {
@@ -56,9 +63,7 @@ public class Setting_Manager : MonoBehaviour
         /* Replace NAME with corresponding string in Audio Mixer */
         _mixer.SetFloat("NAME", _sfxVolumeSlider.value);    // Delete this comment if already replace **************
     }
-
-    /* Other methods */
-    private void ResetBGM()
+    public void ResetBGM()
     {
         _bgm.Stop();
         _bgm.Play();

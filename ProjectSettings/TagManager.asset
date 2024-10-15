@@ -41,6 +41,9 @@ TagManager:
   - name: Tile
     uniqueID: 1477358247
     locked: 0
+  - name: Setting Canvas
+    uniqueID: 3737815431
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
