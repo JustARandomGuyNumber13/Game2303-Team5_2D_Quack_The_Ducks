@@ -8,6 +8,7 @@ public class Player_Behavior : MonoBehaviour
 
     private Rigidbody2D _rb;
     private Transform _transform;
+    private Collider2D _collider;
 
     private float _moveInput;
     private bool _isOnGround;
@@ -24,6 +25,7 @@ public class Player_Behavior : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _transform = transform;
+        _collider = this.GetComponent<Collider2D>();
         _health = _stat._maxHealth;
     }
     private void Update()
@@ -64,7 +66,7 @@ public class Player_Behavior : MonoBehaviour
     }
     private void GroundCheck()
     {
-        RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down * _groundCheckDistance);
+        RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _groundCheckDistance, LayerMask.GetMask("Ground"));
         if (hit.collider != null)
         {
             _isOnGround = true;
