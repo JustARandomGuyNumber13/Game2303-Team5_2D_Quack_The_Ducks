@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(fileName = "NewPlayerStatData", menuName = "Player Stat")]
 public class Player_Stat : ScriptableObject
 {
     [SerializeField] private int maxHealth;
