@@ -5,8 +5,10 @@ using UnityEngine.Pool;
 
 public class Enemy_Manager : MonoBehaviour
 {
+
     [SerializeField] private Enemy_Behavior _enemyPrefab;
     [SerializeField] private bool _isShowGizmo;
+    [SerializeField] private Transform[] playerLocations; 
     
 
     [Header("Pooling system components")]
@@ -19,20 +21,22 @@ public class Enemy_Manager : MonoBehaviour
     private IObjectPool<Enemy_Behavior> _enemyPool;
     private int _waveSpawnAmount = 2, _waveCount = 1;
     private int _spawnCount, _enemyAliveCount;
+    private float _difficulty, _difficultyIncreaseRate = 0.3f;
     private Transform _transform;
 
     private void Awake()
     {
         _transform = transform;
         _enemyPool = new ObjectPool<Enemy_Behavior>(OnCreateNewEnemy, OnGetEnemyFromPool, OnReturnEnemyToPool, OnDestroyEnemy, false, _spawnPresetAmount, _spawnMaxAmount);
+        Invoke("NextWave", 3f);
     }
     private void OnDrawGizmosSelected() // Remove when everthing is done to increase performance
     {
         if (!_isShowGizmo) return;
          
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(_transform.position, Vector2.right * _spawnRange / 2);
-        Gizmos.DrawLine(_transform.position, Vector2.left * _spawnRange / 2);
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.right * _spawnRange / 2);
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.left * _spawnRange / 2);
     }
 
     /* Spawn methods */
@@ -42,18 +46,19 @@ public class Enemy_Manager : MonoBehaviour
         _waveSpawnAmount += 3;
         _enemyAliveCount = _waveSpawnAmount;
         _spawnCount = 0;
+        _difficulty += _difficultyIncreaseRate;
         print(_waveCount);
-        StartCoroutine("SpawnEnemyCoroutine()");
+        StartCoroutine(SpawnEnemyCoroutine());
     }
     private void TransitionToNextWave()
-    { 
+    {
         /* Implement transition to next wave effect, like delay and display UI or something */
-
+        print("TO NEXT WAVE!");
         // Invoke("NextWave", **Duration**);
     }
     IEnumerator SpawnEnemyCoroutine()
     {
-        while (_spawnCount < _spawnMaxAmount)
+        while (_spawnCount < _waveSpawnAmount)
         {
             Enemy_Behavior newEnemy = _enemyPool.Get(); // Spawn/Reactivate enemy
             yield return new WaitForSeconds(_spawnDelay);
@@ -64,22 +69,26 @@ public class Enemy_Manager : MonoBehaviour
     /* Pooling system methods */
     private Enemy_Behavior OnCreateNewEnemy()
     {
-        Enemy_Behavior newEnemy = Instantiate(_enemyPrefab, transform.position, transform.rotation);
-        newEnemy.ObjectPool = _enemyPool;
-        return newEnemy;
+        _spawnCount++;
+        Enemy_Behavior enemy = Instantiate(_enemyPrefab, transform.position, transform.rotation);
+        enemy.ObjectPool = _enemyPool;
+        enemy.SetUpEnemy(playerLocations, this);
+        enemy.SetDifficulty((int)_difficulty);
+        enemy.SetNewPosition(GetRandomPosition(), GetRandomScaleX());
+        return enemy;
     }
     private void OnGetEnemyFromPool(Enemy_Behavior enemy)
     {
         if (enemy.gameObject.activeInHierarchy) return;
 
         _spawnCount++;
+        enemy.SetDifficulty((int)_difficulty);
         enemy.SetNewPosition(GetRandomPosition(), GetRandomScaleX());
         enemy.ReactivateEnemy();
     }
-    private void OnReturnEnemyToPool(Enemy_Behavior enemy)
+    public void OnReturnEnemyToPool(Enemy_Behavior enemy)
     {
         _enemyAliveCount--;
-        enemy.DeactivateEnemy();
         if (_enemyAliveCount == 0) TransitionToNextWave();
     }
     private void OnDestroyEnemy(Enemy_Behavior enemy)

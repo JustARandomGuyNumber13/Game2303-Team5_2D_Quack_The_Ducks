@@ -19,4 +19,7 @@ public class Player_Stat : ScriptableObject
 
     [SerializeField] private float accelerationSpeed;
     public float _accelerationSpeed { get => accelerationSpeed; private set { accelerationSpeed = value; } }
+
+    [SerializeField] private float attackRange;
+    public float _attackRange { get => attackRange; private set { attackRange = value; } }
 }

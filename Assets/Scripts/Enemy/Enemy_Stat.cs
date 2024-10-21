@@ -7,8 +7,16 @@ public class Enemy_Stat : ScriptableObject
 {
     [SerializeField] private int maxHealth;
     public int _maxHealth { get => maxHealth; private set { maxHealth = value; } }
+
     [SerializeField] private float moveSpeed;
     public float _moveSpeed { get => moveSpeed; private set { moveSpeed = value; } }
+
+    [SerializeField] float moveSpeedIncreaseBy;
+    public float _moveSpeedIncreaseBy { get => moveSpeedIncreaseBy; private set { moveSpeedIncreaseBy = value; } }
+
     [SerializeField] private float jumpForce;
     public float _jumpForce { get => jumpForce; private set { jumpForce = value; } }
+
+    [SerializeField] private float bounceBackForce;
+    public float _bounceBackForce { get => bounceBackForce; private set { bounceBackForce = value; } }
 }

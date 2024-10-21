@@ -37,18 +37,13 @@ public class Player_Behavior : MonoBehaviour
     {
         GroundCheck();
     }
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position, Vector2.down * _groundCheckDistance); // Ground check ray
-    }
 
 
     /* Movement handlers */
     private void Move()
     {
         float xSpeed = Mathf.MoveTowards(_rb.velocity.x, _stat._moveSpeed * _moveInput, _stat._accelerationSpeed * Time.fixedDeltaTime);
-        _rb.velocity = new Vector2(xSpeed, _rb.velocity.y);
+        _rb.velocity = Vector2.right * xSpeed + Vector2.up * _rb.velocity.y;
     }
     private void Jump()
     {
@@ -77,15 +72,18 @@ public class Player_Behavior : MonoBehaviour
 
 
     /* Health Handlers */
-    public void TakeDamage(int value)
+    public void TakeDamage(int value, Transform other)
     {
-        _health -= value;
+        _health += value;
         _anim.SetTrigger("hurt");
-
-        /* Implement hurt mechanic here */
-
+        HurtEffect();   // Not Implement yet
 
         if (_health <= 0) Die();
+    }
+    private void HurtEffect()
+    {
+        /* Implement hurt mechanic here */
+
     }
     private void Die()
     {
@@ -99,13 +97,18 @@ public class Player_Behavior : MonoBehaviour
         int randomAttackAnimation = Random.Range(0, 2);
 
         if (_moveInput == 0)
-            _anim.SetTrigger(randomAttackAnimation == 1 ? "attack1" : "attack2");                    // Attack while standing still
-        else
-            _anim.SetTrigger(randomAttackAnimation == 1 ? "walkAttack1" : "walkAttack2");   // Attack while walking
+            _anim.SetTrigger(randomAttackAnimation == 1 ? "attack1" : "attack2");                  
+            _anim.SetTrigger(randomAttackAnimation == 1 ? "walkAttack1" : "walkAttack2");   
     }
     private void Attack()
-    { 
-        /* Implement attack mechanic here */
+    {
+        int facingDir = (int)_transform.localScale.x;
+        Vector3 hitPos = _transform.position + Vector3.right * _stat._attackRange / 2 * facingDir;
+        Collider2D[] hit = Physics2D.OverlapCircleAll(hitPos, _stat._attackRange/2, LayerMask.GetMask("Duck"));
+
+        if (hit.Length != 0)
+            foreach (Collider2D enemy in hit)
+                enemy.GetComponent<Enemy_Behavior>().TakeDamage(-1, _transform);
 
     }
 
@@ -126,7 +129,7 @@ public class Player_Behavior : MonoBehaviour
         if (_attackCoolDown >= _stat._attackCooldown)
         {
             _attackCoolDown = 0;
-            Attack();
+            Attack();   // Not implement yet
             AttackAnimation();
         }
     }
