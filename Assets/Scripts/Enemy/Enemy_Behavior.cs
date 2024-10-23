@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using Pathfinding;
+using Unity.VisualScripting;
 
 public class Enemy_Behavior : MonoBehaviour
 {
@@ -11,11 +13,19 @@ public class Enemy_Behavior : MonoBehaviour
     private IObjectPool<Enemy_Behavior> _objectPool;
     public IObjectPool<Enemy_Behavior> ObjectPool { set => _objectPool = value; }
 
+    [Header("Pathfinding")]
+    private float _nextWayPointDistance = 1f;
+    private Path _path;
+    private Seeker _seeker;
+    private int _currentWayPoint;
+    private bool _isReachedEndOfPath;
+
 
     private Transform[] _playerLocations;
     private Transform _transform, _targetTransform;
     private Enemy_Manager _enemyManager;
     private Rigidbody2D _rb;
+    private Collider2D _collider;
     private int _health, _difficulty;
     private float _moveSpeed;
     private bool _isCanDoThings, _isAlive, isOnGround;
@@ -24,6 +34,8 @@ public class Enemy_Behavior : MonoBehaviour
     {
         _transform = transform;
         _rb = GetComponent<Rigidbody2D>();
+        _collider = GetComponent<Collider2D>();
+        _seeker = GetComponent<Seeker>();
         ResetComponents();
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -42,9 +54,20 @@ public class Enemy_Behavior : MonoBehaviour
             return;
         }
 
-        RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, 0.2f, LayerMask.GetMask("Ground"));
-        if(hit.collider != null) isOnGround = true;
+        // Check is on ground
+        RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _stat._groundCheckDistance, LayerMask.GetMask("Ground"));
+        if (hit.collider != null) isOnGround = true;
     }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * _stat._groundCheckDistance);
+    }
+    private void FixedUpdate()
+    {
+        if (_isAlive && _isCanDoThings)
+            PathFollow();
+    }
+
 
     /* Chase target handlers */
     private IEnumerator ChaseCoroutine()
@@ -52,19 +75,81 @@ public class Enemy_Behavior : MonoBehaviour
         while (_isAlive)
         {
             FindClosestPlayer();
-            FaceCharacterDirection();
             ChasePlayer();
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
     private void ChasePlayer()
     {
-        Vector2 direction = _targetTransform.position - _transform.position;
+        UpdatePath();
     }
-    private void Jump()
+    private void UpdatePath()
     {
-        if(isOnGround)
+        if(_seeker.IsDone()) 
+            _seeker.StartPath(_transform.position, _targetTransform.position, OnPathComplete);      // MOVE
+    }
+    private void PathFollow()
+    {
+        if (_path == null) return;
+
+        if (_currentWayPoint >= _path.vectorPath.Count)
+        {
+            _isReachedEndOfPath = true;
+            return;
+        }
+        else _isReachedEndOfPath = false;
+
+
+        Vector2 direction = (_path.vectorPath[_currentWayPoint] - _transform.position).normalized;
+        Vector2 moveForce = direction.x * _stat._moveSpeed * Vector2.right * Time.fixedDeltaTime;
+        _rb.AddForce(moveForce, ForceMode2D.Force);
+
+
+        if (isOnGround)       
+        {
+            Vector3 tarPos = _targetTransform.position;
+            Vector3 pathPos = _path.vectorPath[_currentWayPoint];
+            Vector3 curPos = _transform.position;
+
+            if (tarPos.y < curPos.y && Mathf.Abs(tarPos.x - curPos.x) < 2f)
+                Descend();
+            else if (curPos.y - pathPos.y > _stat._jumpNodeHeightRequirement)
+                Descend();
+            else if (pathPos.y - curPos.y > _stat._jumpNodeHeightRequirement && tarPos.y > curPos.y)    // Ascend / Jump
+                Ascend();
+        }
+
+        float distance = Vector2.Distance(_transform.position, _path.vectorPath[_currentWayPoint]);
+        if (distance < _nextWayPointDistance)
+            _currentWayPoint++;
+
+        FaceDirection();
+    }
+    private void Ascend()
+    {
+        if (!_collider.usedByEffector)
+        {
             _rb.AddForce(Vector2.up * _stat._jumpForce, ForceMode2D.Impulse);
+            isOnGround = false;
+        }
+    }
+    private void Descend()
+    {
+        _collider.isTrigger = true;
+        isOnGround = false;
+        Invoke("ResetDescend", 0.3f);
+    }
+    private void ResetDescend()
+    {
+        _collider.isTrigger = false;
+    }
+    private void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            _path = p;
+            _currentWayPoint = 0;
+        }
     }
     private void FindClosestPlayer()
     {
@@ -80,10 +165,10 @@ public class Enemy_Behavior : MonoBehaviour
             }
         }
     }
-    private void FaceCharacterDirection()
+    private void FaceDirection()
     {
         Vector3 curScale = _transform.localScale;
-        curScale.x = _targetTransform.position.x > _transform.position.x ? 1 : -1;
+        curScale.x = _rb.velocity.x > 0 ? 1 : -1;
         _transform.localScale.Scale(curScale);
     }
 
@@ -102,8 +187,8 @@ public class Enemy_Behavior : MonoBehaviour
     }
     private void HurtEffect(Transform other)
     { 
-        /* Implement hurt effect */
         Vector3 bounceBackDir = _transform.position - other.position;
+        _rb.velocity = Vector2.up * _rb.velocity.y; // Reset velocity x
         _rb.AddForce(bounceBackDir * _stat._bounceBackForce, ForceMode2D.Impulse);
     }
     private void DieEffect()
@@ -116,11 +201,15 @@ public class Enemy_Behavior : MonoBehaviour
     /* Pooling system methods */
     public void DeactivateEnemy()
     {
+        _collider.enabled = false;
+        _rb.gravityScale = 0;
         _enemyManager.OnReturnEnemyToPool(this);
         this.gameObject.SetActive(false);
     }
     public void ReactivateEnemy()
     {
+        _collider.enabled = true;
+        _rb.gravityScale = 1;
         ResetComponents();
         this.gameObject.SetActive(true);
     }

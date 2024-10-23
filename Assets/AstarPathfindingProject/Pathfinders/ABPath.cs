@@ -609,8 +609,9 @@ namespace Pathfinding {
 			int counter = 0;
 
 			// Continue to search as long as we haven't encountered an error and we haven't found the target
-			while (CompleteState == PathCompleteState.NotCalculated) {
-				searchedNodes++;
+			while (CompleteState == PathCompleteState.NotCalculated)
+            {//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                searchedNodes++;
 
 				// Close the current node, if the current node is the target node then the path is finished
 				if (currentR.flag1) {
@@ -620,7 +621,8 @@ namespace Pathfinding {
 					break;
 				}
 
-				if (currentR.H < partialBestTarget.H) {
+				if (currentR.H < partialBestTarget.H)
+				{
 					partialBestTarget = currentR;
 				}
 
@@ -633,7 +635,7 @@ namespace Pathfinding {
 
 				// Any nodes left to search?
 				if (pathHandler.heap.isEmpty) {
-					if (calculatePartial && partialBestTarget != null) {
+                    if (calculatePartial && partialBestTarget != null) {
 						CompleteState = PathCompleteState.Partial;
 						Trace(partialBestTarget);
 					} else {
@@ -663,9 +665,9 @@ namespace Pathfinding {
 				}
 
 				counter++;
-			}
+            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			AstarProfiler.StartProfile("Trace");
+            AstarProfiler.StartProfile("Trace");
 
 			if (CompleteState == PathCompleteState.Complete) {
 				Trace(currentR);

@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: NewEnemyStatData
   m_EditorClassIdentifier: 
   maxHealth: 2
-  moveSpeed: 5
+  moveSpeed: 300
   moveSpeedIncreaseBy: 0.1
-  jumpForce: 5
-  bounceBackForce: 3
+  jumpForce: 15.2
+  bounceBackForce: 5
+  groundCheckDistance: 0.6
+  jumpNodeHeightRequirement: 0.8

@@ -19,4 +19,10 @@ public class Enemy_Stat : ScriptableObject
 
     [SerializeField] private float bounceBackForce;
     public float _bounceBackForce { get => bounceBackForce; private set { bounceBackForce = value; } }
+
+    [SerializeField] private float groundCheckDistance;
+    public float _groundCheckDistance { get => groundCheckDistance; private set { groundCheckDistance = value; } }
+
+    [SerializeField] private float jumpNodeHeightRequirement;
+    public float _jumpNodeHeightRequirement { get => jumpNodeHeightRequirement; private set { jumpNodeHeightRequirement = value; } }
 }

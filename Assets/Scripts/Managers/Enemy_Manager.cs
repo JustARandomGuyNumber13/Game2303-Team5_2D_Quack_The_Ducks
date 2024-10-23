@@ -17,9 +17,13 @@ public class Enemy_Manager : MonoBehaviour
     [SerializeField] private float _spawnRange;
     [SerializeField] private float _spawnDelay;
 
+    [Header("Optional")]
+    [SerializeField] private int _firstWaveEnemyAmount = 1;
+    [SerializeField] private int _enemyAmountIncreaseRate = 2;
+
 
     private IObjectPool<Enemy_Behavior> _enemyPool;
-    private int _waveSpawnAmount = 2, _waveCount = 1;
+    private int _waveSpawnAmount, _waveCount = 0;
     private int _spawnCount, _enemyAliveCount;
     private float _difficulty, _difficultyIncreaseRate = 0.3f;
     private Transform _transform;
@@ -28,6 +32,7 @@ public class Enemy_Manager : MonoBehaviour
     {
         _transform = transform;
         _enemyPool = new ObjectPool<Enemy_Behavior>(OnCreateNewEnemy, OnGetEnemyFromPool, OnReturnEnemyToPool, OnDestroyEnemy, false, _spawnPresetAmount, _spawnMaxAmount);
+        _waveSpawnAmount += _firstWaveEnemyAmount - _enemyAmountIncreaseRate;
         Invoke("NextWave", 3f);
     }
     private void OnDrawGizmosSelected() // Remove when everthing is done to increase performance
@@ -43,11 +48,10 @@ public class Enemy_Manager : MonoBehaviour
     private void NextWave()
     {
         _waveCount++;
-        _waveSpawnAmount += 3;
+        _waveSpawnAmount += _enemyAmountIncreaseRate;
         _enemyAliveCount = _waveSpawnAmount;
         _spawnCount = 0;
         _difficulty += _difficultyIncreaseRate;
-        print(_waveCount);
         StartCoroutine(SpawnEnemyCoroutine());
     }
     private void TransitionToNextWave()
