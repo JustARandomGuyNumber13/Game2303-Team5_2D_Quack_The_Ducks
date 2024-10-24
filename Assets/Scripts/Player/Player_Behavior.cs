@@ -1,10 +1,17 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Player_Behavior : MonoBehaviour
 {
+    [Header("Manual components")]
+    [SerializeField] private Player_Manager _manager;
+    [SerializeField] private UI_Manager _managerUI;
+
+    [Header("Prefab components")]
     [SerializeField] private Player_Stat _stat;
     [SerializeField] private Animator _anim;
+    [SerializeField] private GameObject _shieldSprite;
 
     private Rigidbody2D _rb;
     private Transform _transform;
@@ -13,9 +20,10 @@ public class Player_Behavior : MonoBehaviour
     private float _moveInput;
     private bool _isOnGround;
     private bool _isSecondJump;
+    private bool _isCanDoThings = true;
     private float _groundCheckDistance = 1f;
 
-    private int _health;
+    public int _health { get; private set; }
 
     private float _attackCoolDown;
 
@@ -36,6 +44,8 @@ public class Player_Behavior : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         GroundCheck();
+        if(collision.gameObject.tag == "Destroyer")
+            DeactivatePlayer();
     }
 
 
@@ -76,18 +86,20 @@ public class Player_Behavior : MonoBehaviour
     {
         _health += value;
         _anim.SetTrigger("hurt");
-        HurtEffect();   // Not Implement yet
+        HurtEffect(other);
+        _managerUI.UpdateLive(this);
 
         if (_health <= 0) Die();
     }
-    private void HurtEffect()
+    private void HurtEffect(Transform other)
     {
-        /* Implement hurt mechanic here */
-
+        Vector3 bounceBackDir = _transform.position - other.position;
+        _rb.velocity = Vector2.up * _rb.velocity.y; // Reset velocity x
+        _rb.AddForce(bounceBackDir * _stat._bounceBackForce, ForceMode2D.Impulse);
     }
     private void Die()
     {
-        this.gameObject.SetActive(false);
+        DeactivatePlayer();
     }
 
 
@@ -108,9 +120,38 @@ public class Player_Behavior : MonoBehaviour
 
         if (hit.Length != 0)
             foreach (Collider2D enemy in hit)
-                enemy.GetComponent<Enemy_Behavior>().TakeDamage(-1, _transform);
-
+                if(enemy != _collider)
+                    enemy.GetComponent<Enemy_Behavior>().TakeDamage(-1, _transform);
     }
+
+
+    /* Player_Manger helper methods */
+    public void ReactivatePlayer()
+    {
+        _shieldSprite.SetActive(true);
+        _moveInput = 0;
+        _isOnGround = false;
+        this.gameObject.layer = LayerMask.NameToLayer("Duck");
+        this.gameObject.SetActive(true);
+        StopAllCoroutines();
+        StartCoroutine(TriggerCanDoThings());
+    }
+    private void DeactivatePlayer()
+    {
+        _isCanDoThings = false;
+        _health--;
+        _managerUI.UpdateLive(this);
+        _manager.PlayerDieEvent(this);
+        this.gameObject.SetActive(false);
+    }
+    private IEnumerator TriggerCanDoThings()
+    {
+        yield return new WaitForSeconds(3f);
+        _shieldSprite.SetActive(false);
+        _isCanDoThings = true;
+        this.gameObject.layer = LayerMask.NameToLayer("Player");
+    }
+
 
 
     /* Input Handlers => New Input System */
@@ -126,10 +167,10 @@ public class Player_Behavior : MonoBehaviour
     }
     private void OnAttack()
     {
-        if (_attackCoolDown >= _stat._attackCooldown)
+        if (_attackCoolDown >= _stat._attackCooldown && _isCanDoThings)
         {
             _attackCoolDown = 0;
-            Attack();   // Not implement yet
+            Attack();   
             AttackAnimation();
         }
     }

@@ -22,4 +22,7 @@ public class Player_Stat : ScriptableObject
 
     [SerializeField] private float attackRange;
     public float _attackRange { get => attackRange; private set { attackRange = value; } }
+
+    [SerializeField] private float bounceBackForce;
+    public float _bounceBackForce { get => bounceBackForce; private set { bounceBackForce = value; } }
 }

@@ -19,3 +19,4 @@ MonoBehaviour:
   bounceBackForce: 5
   groundCheckDistance: 0.6
   jumpNodeHeightRequirement: 0.8
+  explosionRange: 2

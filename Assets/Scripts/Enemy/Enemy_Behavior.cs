@@ -8,20 +8,20 @@ using Unity.VisualScripting;
 public class Enemy_Behavior : MonoBehaviour
 {
     [SerializeField] Enemy_Stat _stat;
+    [SerializeField] private GameObject _explosionSprite, _enemySprite;
 
-    [Header("Ignore")]
-    private IObjectPool<Enemy_Behavior> _objectPool;
-    public IObjectPool<Enemy_Behavior> ObjectPool { set => _objectPool = value; }
 
     [Header("Pathfinding")]
     private float _nextWayPointDistance = 1f;
     private Path _path;
     private Seeker _seeker;
     private int _currentWayPoint;
-    private bool _isReachedEndOfPath;
 
 
+    private IObjectPool<Enemy_Behavior> _objectPool;
+    public IObjectPool<Enemy_Behavior> ObjectPool { set => _objectPool = value; }
     private Transform[] _playerLocations;
+    private Player_Behavior[] _playerBehaviors;
     private Transform _transform, _targetTransform;
     private Enemy_Manager _enemyManager;
     private Rigidbody2D _rb;
@@ -29,6 +29,7 @@ public class Enemy_Behavior : MonoBehaviour
     private int _health, _difficulty;
     private float _moveSpeed;
     private bool _isCanDoThings, _isAlive, isOnGround;
+
 
     private void Awake()
     {
@@ -40,27 +41,29 @@ public class Enemy_Behavior : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // Initial check for first ground touch after spawn
         if (!_isCanDoThings)
         {
-            _isCanDoThings = true;  // Initial check for first ground touch after spawn
+            _isCanDoThings = true;  
             StartCoroutine(ChaseCoroutine());
         }
 
+        // Die on touch
         if (collision.gameObject.tag == "Player")
         {
             collision.gameObject.GetComponent<Player_Behavior>().TakeDamage(-1, _transform);
-            DieEffect();    // Not implement yet
-            DeactivateEnemy();
+            DieEffect();
+            return;
+        }
+        else if (collision.gameObject.tag == "Destroyer")
+        {
+            DieEffect();
             return;
         }
 
         // Check is on ground
         RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _stat._groundCheckDistance, LayerMask.GetMask("Ground"));
         if (hit.collider != null) isOnGround = true;
-    }
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * _stat._groundCheckDistance);
     }
     private void FixedUpdate()
     {
@@ -75,37 +78,28 @@ public class Enemy_Behavior : MonoBehaviour
         while (_isAlive)
         {
             FindClosestPlayer();
-            ChasePlayer();
+            UpdatePath();
             yield return new WaitForSeconds(0.3f);
         }
     }
-    private void ChasePlayer()
-    {
-        UpdatePath();
-    }
     private void UpdatePath()
     {
-        if(_seeker.IsDone()) 
-            _seeker.StartPath(_transform.position, _targetTransform.position, OnPathComplete);      // MOVE
+        if(_seeker.IsDone() && _targetTransform != null) 
+            _seeker.StartPath(_transform.position, _targetTransform.position, OnPathComplete);      
     }
     private void PathFollow()
     {
-        if (_path == null) return;
-
-        if (_currentWayPoint >= _path.vectorPath.Count)
-        {
-            _isReachedEndOfPath = true;
+        if (_path == null || _currentWayPoint >= _path.vectorPath.Count)
             return;
-        }
-        else _isReachedEndOfPath = false;
+        
 
-
+        // Movement calculation handler
         Vector2 direction = (_path.vectorPath[_currentWayPoint] - _transform.position).normalized;
         Vector2 moveForce = direction.x * _stat._moveSpeed * Vector2.right * Time.fixedDeltaTime;
-        _rb.AddForce(moveForce, ForceMode2D.Force);
+        _rb.AddForce(moveForce, ForceMode2D.Force);    
 
-
-        if (isOnGround)       
+        // Ascend and Descend handler
+        if (isOnGround)      
         {
             Vector3 tarPos = _targetTransform.position;
             Vector3 pathPos = _path.vectorPath[_currentWayPoint];
@@ -115,27 +109,28 @@ public class Enemy_Behavior : MonoBehaviour
                 Descend();
             else if (curPos.y - pathPos.y > _stat._jumpNodeHeightRequirement)
                 Descend();
-            else if (pathPos.y - curPos.y > _stat._jumpNodeHeightRequirement && tarPos.y > curPos.y)    // Ascend / Jump
+            else if (pathPos.y - curPos.y > _stat._jumpNodeHeightRequirement && tarPos.y > curPos.y)    
                 Ascend();
         }
 
+        // Update next destination
         float distance = Vector2.Distance(_transform.position, _path.vectorPath[_currentWayPoint]);
         if (distance < _nextWayPointDistance)
             _currentWayPoint++;
+
+        if(_targetTransform.position.y < -3)
+            _rb.velocity = Vector2.up * _rb.velocity.y;
 
         FaceDirection();
     }
     private void Ascend()
     {
-        if (!_collider.usedByEffector)
-        {
-            _rb.AddForce(Vector2.up * _stat._jumpForce, ForceMode2D.Impulse);
-            isOnGround = false;
-        }
+        _rb.AddForce(Vector2.up * _stat._jumpForce, ForceMode2D.Impulse);
+        isOnGround = false;
     }
     private void Descend()
     {
-        _collider.isTrigger = true;
+        _collider.isTrigger = true; // _collider.usedByEffector is buggy for some reason
         isOnGround = false;
         Invoke("ResetDescend", 0.3f);
     }
@@ -169,7 +164,7 @@ public class Enemy_Behavior : MonoBehaviour
     {
         Vector3 curScale = _transform.localScale;
         curScale.x = _rb.velocity.x > 0 ? 1 : -1;
-        _transform.localScale.Scale(curScale);
+        _transform.localScale = curScale;
     }
 
 
@@ -177,39 +172,57 @@ public class Enemy_Behavior : MonoBehaviour
     public void TakeDamage(int value, Transform other)
     {
         _health += value;
-        HurtEffect(other);   // Not implement yet
+        HurtEffect(other);   
 
         if (_health <= 0)
         {
-            DieEffect();    // Not implement yet
-            DeactivateEnemy();
+            DieEffect();  
         }
     }
     private void HurtEffect(Transform other)
     { 
+        // Push enemy back against "other" direction
         Vector3 bounceBackDir = _transform.position - other.position;
         _rb.velocity = Vector2.up * _rb.velocity.y; // Reset velocity x
         _rb.AddForce(bounceBackDir * _stat._bounceBackForce, ForceMode2D.Impulse);
     }
     private void DieEffect()
     {
-        /* Implement die effect */
+        // Cause a small explosion toward every "target" in the area
+        Collider2D[] hit = Physics2D.OverlapCircleAll(_transform.position, _stat._explosionRange, LayerMask.GetMask("Player"));
+        if (hit.Length > 0)
+        {
+            foreach (Collider2D target in hit)
+                for (int i = 0; i < _playerLocations.Length; i++)
+                    if (target.gameObject == _playerLocations[i].gameObject)
+                    {
+                        _playerBehaviors[i].TakeDamage(0, _transform);
+                    }
+        }
+        _rb.velocity = Vector2.right;
+        FaceDirection();
+        _enemySprite.SetActive(false);
+        _explosionSprite.SetActive(true);
         _isAlive = false;
+        _collider.enabled = false;
+        _rb.velocity = Vector2.zero;
+        _rb.gravityScale = 0;
+        Invoke("DeactivateEnemy", 0.5f);
     }
 
 
     /* Pooling system methods */
     public void DeactivateEnemy()
     {
-        _collider.enabled = false;
-        _rb.gravityScale = 0;
         _enemyManager.OnReturnEnemyToPool(this);
         this.gameObject.SetActive(false);
     }
     public void ReactivateEnemy()
     {
+        _enemySprite.SetActive(true);
+        _explosionSprite.SetActive(false);
         _collider.enabled = true;
-        _rb.gravityScale = 1;
+        _rb.gravityScale = 3;
         ResetComponents();
         this.gameObject.SetActive(true);
     }
@@ -235,9 +248,10 @@ public class Enemy_Behavior : MonoBehaviour
 
 
     /* Other methods */
-    public void SetUpEnemy(Transform[] value1, Enemy_Manager value2)
-    { 
-        _playerLocations = value1;
+    public void SetUpEnemy(Enemy_Manager value2)
+    {
         _enemyManager = value2;
+        _playerLocations = _enemyManager.playerLocations;
+        _playerBehaviors = _enemyManager.playerBehaviors;
     }
 }

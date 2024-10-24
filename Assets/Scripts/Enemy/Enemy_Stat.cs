@@ -25,4 +25,8 @@ public class Enemy_Stat : ScriptableObject
 
     [SerializeField] private float jumpNodeHeightRequirement;
     public float _jumpNodeHeightRequirement { get => jumpNodeHeightRequirement; private set { jumpNodeHeightRequirement = value; } }
+
+    [SerializeField] private float explosionRange;
+    public float _explosionRange { get => explosionRange; private set { explosionRange = value; } }
+
 }

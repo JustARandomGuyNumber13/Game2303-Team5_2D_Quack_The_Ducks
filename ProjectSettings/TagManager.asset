@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Destroyer
   layers:
   - Default
   - TransparentFX
@@ -43,6 +44,12 @@ TagManager:
     locked: 0
   - name: Setting Canvas
     uniqueID: 3737815431
+    locked: 0
+  - name: Duck
+    uniqueID: 3660288829
+    locked: 0
+  - name: Player
+    uniqueID: 2927273997
     locked: 0
   - name: Default
     uniqueID: 0

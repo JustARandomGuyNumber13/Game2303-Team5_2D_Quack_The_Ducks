@@ -5,10 +5,10 @@ using UnityEngine.Pool;
 
 public class Enemy_Manager : MonoBehaviour
 {
-
     [SerializeField] private Enemy_Behavior _enemyPrefab;
     [SerializeField] private bool _isShowGizmo;
-    [SerializeField] private Transform[] playerLocations; 
+    public Transform[] playerLocations;
+    public Player_Behavior[] playerBehaviors;
     
 
     [Header("Pooling system components")]
@@ -28,6 +28,8 @@ public class Enemy_Manager : MonoBehaviour
     private float _difficulty, _difficultyIncreaseRate = 0.3f;
     private Transform _transform;
 
+
+    /* Monobehavior methods */
     private void Awake()
     {
         _transform = transform;
@@ -35,14 +37,7 @@ public class Enemy_Manager : MonoBehaviour
         _waveSpawnAmount += _firstWaveEnemyAmount - _enemyAmountIncreaseRate;
         Invoke("NextWave", 3f);
     }
-    private void OnDrawGizmosSelected() // Remove when everthing is done to increase performance
-    {
-        if (!_isShowGizmo) return;
-         
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.right * _spawnRange / 2);
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.left * _spawnRange / 2);
-    }
+
 
     /* Spawn methods */
     private void NextWave()
@@ -64,7 +59,7 @@ public class Enemy_Manager : MonoBehaviour
     {
         while (_spawnCount < _waveSpawnAmount)
         {
-            Enemy_Behavior newEnemy = _enemyPool.Get(); // Spawn/Reactivate enemy
+            Enemy_Behavior newEnemy = _enemyPool.Get(); // Spawn / Reactivate enemy
             yield return new WaitForSeconds(_spawnDelay);
         }
     }
@@ -76,7 +71,7 @@ public class Enemy_Manager : MonoBehaviour
         _spawnCount++;
         Enemy_Behavior enemy = Instantiate(_enemyPrefab, transform.position, transform.rotation);
         enemy.ObjectPool = _enemyPool;
-        enemy.SetUpEnemy(playerLocations, this);
+        enemy.SetUpEnemy(this);
         enemy.SetDifficulty((int)_difficulty);
         enemy.SetNewPosition(GetRandomPosition(), GetRandomScaleX());
         return enemy;
@@ -85,6 +80,7 @@ public class Enemy_Manager : MonoBehaviour
     {
         if (enemy.gameObject.activeInHierarchy) return;
 
+        print("Get from pool");
         _spawnCount++;
         enemy.SetDifficulty((int)_difficulty);
         enemy.SetNewPosition(GetRandomPosition(), GetRandomScaleX());
