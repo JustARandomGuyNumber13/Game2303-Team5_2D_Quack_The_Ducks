@@ -23,7 +23,6 @@ public class Enemy_Behavior : MonoBehaviour
     private Transform[] _playerLocations;
     private Player_Behavior[] _playerBehaviors;
     private Transform _transform, _targetTransform;
-    private Enemy_Manager _enemyManager;
     private Rigidbody2D _rb;
     private Collider2D _collider;
     private int _health, _difficulty;
@@ -214,8 +213,7 @@ public class Enemy_Behavior : MonoBehaviour
     /* Pooling system methods */
     public void DeactivateEnemy()
     {
-        _enemyManager.OnReturnEnemyToPool(this);
-        this.gameObject.SetActive(false);
+        _objectPool.Release(this);
     }
     public void ReactivateEnemy()
     {
@@ -236,7 +234,7 @@ public class Enemy_Behavior : MonoBehaviour
     }
     private void ResetComponents()
     {
-        _health = _stat._maxHealth + _difficulty;
+        _health = _stat._maxHealth + _difficulty / 3;
         _isCanDoThings = false;
         _isAlive = true;
     }
@@ -248,10 +246,9 @@ public class Enemy_Behavior : MonoBehaviour
 
 
     /* Other methods */
-    public void SetUpEnemy(Enemy_Manager value2)
+    public void SetUpEnemy(Enemy_Manager value)
     {
-        _enemyManager = value2;
-        _playerLocations = _enemyManager.playerLocations;
-        _playerBehaviors = _enemyManager.playerBehaviors;
+        _playerLocations = value.playerLocations;
+        _playerBehaviors = value.playerBehaviors;
     }
 }

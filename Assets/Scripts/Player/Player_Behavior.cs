@@ -69,6 +69,19 @@ public class Player_Behavior : MonoBehaviour
             _isOnGround = false;
         }
     }
+    private void Descend()
+    {
+        if (_isOnGround && _transform.position.y > -2.7f)
+        {
+            _collider.isTrigger = true;
+            _isOnGround = false;
+            Invoke("DescendReset", 0.3f);
+        }
+    }
+    private void DescendReset()
+    {
+        _collider.isTrigger = false;
+    }
     private void GroundCheck()
     {
         RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _groundCheckDistance, LayerMask.GetMask("Ground"));
@@ -164,6 +177,10 @@ public class Player_Behavior : MonoBehaviour
     private void OnJump()
     {
         Jump();
+    }
+    private void OnDescend()
+    {
+        Descend();
     }
     private void OnAttack()
     {
