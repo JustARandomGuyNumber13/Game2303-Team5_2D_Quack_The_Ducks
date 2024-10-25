@@ -2,7 +2,7 @@
     "name": "PlayerActionMap",
     "maps": [
         {
-            "name": "Player",
+            "name": "Player1",
             "id": "830afb56-287d-4809-80df-e6cff9fa22a3",
             "actions": [
                 {
@@ -18,6 +18,15 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "c6977ba1-0301-415a-895d-f71e03428941",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Descend",
+                    "type": "Button",
+                    "id": "ade69193-8465-44b6-aba1-e0af8e6861b0",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -70,7 +79,7 @@
                 {
                     "name": "",
                     "id": "4b2a2904-a97b-4aa0-afad-1da1a244946c",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -80,19 +89,19 @@
                 },
                 {
                     "name": "",
-                    "id": "66e85346-2d9f-411d-86a3-e369c914af14",
-                    "path": "<Keyboard>/numpad2",
+                    "id": "4505a816-4eaa-417e-b74c-97fa2e316324",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Jump",
+                    "action": "Descend",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "73c302e1-1993-4abf-b570-75e5bfc267ad",
-                    "path": "<Keyboard>/numpad1",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -104,6 +113,116 @@
         },
         {
             "name": "Player2",
+            "id": "e9bd7d18-c1eb-4068-803e-1c72f4bf0111",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "d755ac0d-bff9-4e76-91c8-84e30ba0e002",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "e04d761b-59cf-4393-aa64-f48588323934",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Descend",
+                    "type": "Button",
+                    "id": "d99b81f7-ec4b-4c44-815c-de30a9cf4268",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "9b104b8f-a7cf-40ed-a6d1-fc1ecf58c376",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "2D Vector",
+                    "id": "c5dd0c04-e421-4417-8e16-72a2fe071f39",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "left",
+                    "id": "01404436-4f08-4db8-bce4-15035d9ba207",
+                    "path": "<Keyboard>/numpad4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "b1ef9b66-5129-4d12-a864-818b3e2f1a3b",
+                    "path": "<Keyboard>/numpad6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "acf36704-ec62-45e3-be7a-26287f6f5ba6",
+                    "path": "<Keyboard>/numpad8",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bced643b-aae8-4670-a8cb-ccd346e17b16",
+                    "path": "<Keyboard>/numpad5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Descend",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "db476c10-88e6-4ef1-8d4f-504b7e0ec784",
+                    "path": "<Keyboard>/numpadEnter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Player3",
             "id": "da3061ff-c510-42e4-8a5b-668a1ece84df",
             "actions": [
                 {
@@ -119,6 +238,15 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "c914eaf4-c008-466e-a198-3805406f2f74",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Descend",
+                    "type": "Button",
+                    "id": "e70862e6-5220-4f69-8ffc-c58b71d11e10",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -171,7 +299,7 @@
                 {
                     "name": "",
                     "id": "e6fe9469-5bcc-4be5-8efa-03050c99c672",
-                    "path": "<Keyboard>/x",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -181,8 +309,129 @@
                 },
                 {
                     "name": "",
+                    "id": "c0f79191-cd2d-425d-9d41-f0ed34628e8a",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Descend",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "6e28fb07-4e1f-41ba-bca5-6b1a648f1e30",
-                    "path": "<Keyboard>/c",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Player4",
+            "id": "1cf732a8-e3b7-4bc8-a4a4-b84fad97663a",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "a22d30cb-a6c3-4a7f-b5d3-782d7b531f66",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "37445f81-4d90-41e5-84f2-20080de49b87",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Descend",
+                    "type": "Button",
+                    "id": "e19fe786-89b0-403b-9c24-7acc3373c810",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "e2ce84a7-a7d3-41c6-9dfd-d33c965dd98b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "2D Vector",
+                    "id": "f6f69e17-6f79-4238-99e1-3a69a268cd91",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "left",
+                    "id": "1d49044b-1568-4696-a2d7-ef6627197d0a",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "0587afbb-19f2-4d4c-8e71-cedea72c0b3c",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "85526e9e-1d1b-40e2-95f2-ed5572205c2b",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0d2d3b14-8997-47a6-9d1c-75af4079cca5",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Descend",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "14d5ef89-c09e-405f-92a3-0290064cb53e",
+                    "path": "<Keyboard>/slash",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

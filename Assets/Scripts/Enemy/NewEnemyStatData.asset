@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 2
   moveSpeed: 300
-  moveSpeedIncreaseBy: 0.1
+  moveSpeedIncreaseBy: 30
   jumpForce: 15.2
   bounceBackForce: 5
   groundCheckDistance: 0.6
