@@ -12,6 +12,15 @@ EditorBuildSettings:
     path: Assets/Scenes/1_Game_Scene_1_Player.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/3_ScoreBoard_Scene.unity
+    path: Assets/Scenes/2_Game_Scene_2_Player.unity
+    guid: 4911fdf820a3a184f835fcd2bfe6bc7e
+  - enabled: 1
+    path: Assets/Scenes/3_Game_Scene_3_Player.unity
+    guid: df4b9afed7de7bc439313c24ee86315d
+  - enabled: 1
+    path: Assets/Scenes/4_Game_Scene_4_Player.unity
+    guid: 43671d9f7c51cd14594d95a17aabdce3
+  - enabled: 1
+    path: Assets/Scenes/10_ScoreBoard_Scene.unity
     guid: 5ae03bee58d05414d9996b2172bf0923
   m_configObjects: {}
