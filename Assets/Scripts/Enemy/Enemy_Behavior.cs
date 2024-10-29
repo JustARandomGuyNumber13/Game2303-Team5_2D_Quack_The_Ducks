@@ -24,12 +24,13 @@ public class Enemy_Behavior : MonoBehaviour
     private Player_Behavior[] _playerBehaviors;
     private Transform _transform, _targetTransform;
     private Rigidbody2D _rb;
-    private Collider2D _collider;
+    private Collider2D _collider, _curPlatformStandOn;
     private int _health, _difficulty;
     private float _moveSpeed;
     private bool _isCanDoThings, _isAlive, isOnGround;
 
 
+    /* Monobehavior methods */
     private void Awake()
     {
         _transform = transform;
@@ -62,7 +63,11 @@ public class Enemy_Behavior : MonoBehaviour
 
         // Check is on ground
         RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _stat._groundCheckDistance, LayerMask.GetMask("Ground"));
-        if (hit.collider != null) isOnGround = true;
+        if (hit.collider != null)
+        {
+            _curPlatformStandOn = hit.collider;
+            isOnGround = true;
+        }
     }
     private void FixedUpdate()
     {
@@ -91,7 +96,6 @@ public class Enemy_Behavior : MonoBehaviour
         if (_path == null || _currentWayPoint >= _path.vectorPath.Count)
             return;
         
-
         // Movement calculation handler
         Vector2 direction = (_path.vectorPath[_currentWayPoint] - _transform.position).normalized;
         Vector2 moveForce = direction.x * _stat._moveSpeed * Vector2.right * Time.fixedDeltaTime;
@@ -124,18 +128,19 @@ public class Enemy_Behavior : MonoBehaviour
     }
     private void Ascend()
     {
+        _rb.velocity = Vector2.right * _rb.velocity.x;
         _rb.AddForce(Vector2.up * _stat._jumpForce, ForceMode2D.Impulse);
         isOnGround = false;
     }
     private void Descend()
     {
-        _collider.isTrigger = true; // _collider.usedByEffector is buggy for some reason
+        Physics2D.IgnoreCollision(_collider, _curPlatformStandOn, true);
         isOnGround = false;
         Invoke("ResetDescend", 0.3f);
     }
     private void ResetDescend()
     {
-        _collider.isTrigger = false;
+        Physics2D.IgnoreCollision(_collider, _curPlatformStandOn, false);
     }
     private void OnPathComplete(Path p)
     {
