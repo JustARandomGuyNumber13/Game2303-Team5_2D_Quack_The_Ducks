@@ -2,18 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Setting_Manager : MonoBehaviour
 {
     private static Setting_Manager SETTING_MANAGER;
-    [SerializeField] private GameObject _settingMenuCanvas;
+    [SerializeField] private GameObject _audioMenu, _keyBindingMenu, _keyBindingMenuButton;
     [SerializeField] private AudioMixer _mixer;
     [SerializeField] private AudioSource _bgm;
     [SerializeField] Slider _bgmVolumeSlider;
     [SerializeField] Slider _sfxVolumeSlider;
+    private bool _isInSetting;
 
-
+    /* Monobehavior methods */
     private void Awake()
     {
         if (SETTING_MANAGER == null)
@@ -28,9 +32,10 @@ public class Setting_Manager : MonoBehaviour
     }
     private void Start()
     {
-        _settingMenuCanvas.SetActive(false);
+        ToggleSettingMenu(false);
         ResetBGM();
     }
+
 
     /* Controlable in UI methods */
     public void ToggleSettingMenu(bool value)
@@ -41,7 +46,14 @@ public class Setting_Manager : MonoBehaviour
             return;
         }
 
-        _settingMenuCanvas.SetActive(value);
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            _keyBindingMenuButton.SetActive(value);
+        else
+            _keyBindingMenuButton.SetActive(false);
+
+        _isInSetting = value;
+        _audioMenu.SetActive(value);
+        _keyBindingMenu.SetActive(false);
         if (value)
         {
             Time.timeScale = 0;
@@ -52,6 +64,17 @@ public class Setting_Manager : MonoBehaviour
             Time.timeScale = 1f;
             _bgm.UnPause();
         }
+    }
+    public void ToggleKeyBindingSettingMenu(bool value)
+    {
+        if (SETTING_MANAGER != null && SETTING_MANAGER != this) // Trick to call this method as a prefab component
+        {
+            SETTING_MANAGER.ToggleKeyBindingSettingMenu(value);
+            return;
+        }
+
+        _audioMenu.SetActive(!value);
+        _keyBindingMenu.SetActive(value);
     }
     public void SetBgmVolume()
     {
@@ -69,9 +92,10 @@ public class Setting_Manager : MonoBehaviour
         _bgm.Play();
     }
 
-    /* Input handler => Input action map*/
+
+    /* Input handler => Input action map */
     private void OnToggleSettingMenu()
     {
-        ToggleSettingMenu(!_settingMenuCanvas.activeInHierarchy);
+        ToggleSettingMenu(!_isInSetting);
     }
 }

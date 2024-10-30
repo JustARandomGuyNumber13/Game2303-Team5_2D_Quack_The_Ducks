@@ -15,7 +15,7 @@ public class Player_Behavior : MonoBehaviour
 
     private Rigidbody2D _rb;
     private Transform _transform;
-    private Collider2D _collider;
+    private Collider2D _collider, _curPlatformStandOn;
 
     private float _moveInput;
     private bool _isOnGround;
@@ -73,20 +73,21 @@ public class Player_Behavior : MonoBehaviour
     {
         if (_isOnGround && _transform.position.y > -2.7f)
         {
-            _collider.isTrigger = true;
+            Physics2D.IgnoreCollision(_collider, _curPlatformStandOn, true);
             _isOnGround = false;
             Invoke("DescendReset", 0.3f);
         }
     }
     private void DescendReset()
     {
-        _collider.isTrigger = false;
+        Physics2D.IgnoreCollision(_collider, _curPlatformStandOn, false);
     }
     private void GroundCheck()
     {
         RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _groundCheckDistance, LayerMask.GetMask("Ground"));
         if (hit.collider != null)
         {
+            _curPlatformStandOn = hit.collider;
             _isOnGround = true;
             _isSecondJump = false;
             _anim.SetBool("onGround", true);
