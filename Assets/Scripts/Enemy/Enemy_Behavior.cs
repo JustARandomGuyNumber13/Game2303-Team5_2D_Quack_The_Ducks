@@ -25,6 +25,7 @@ public class Enemy_Behavior : MonoBehaviour
     private Transform _transform, _targetTransform;
     private Rigidbody2D _rb;
     private Collider2D _collider, _curPlatformStandOn;
+    private AudioSource _audio;
     private int _health, _difficulty;
     private float _moveSpeed;
     private bool _isCanDoThings, _isAlive, isOnGround;
@@ -37,6 +38,7 @@ public class Enemy_Behavior : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _collider = GetComponent<Collider2D>();
         _seeker = GetComponent<Seeker>();
+        _audio = GetComponent<AudioSource>();
         ResetComponents();
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -211,6 +213,7 @@ public class Enemy_Behavior : MonoBehaviour
         _collider.enabled = false;
         _rb.velocity = Vector2.zero;
         _rb.gravityScale = 0;
+        _audio.Play();
         Invoke("DeactivateEnemy", 0.5f);
     }
 

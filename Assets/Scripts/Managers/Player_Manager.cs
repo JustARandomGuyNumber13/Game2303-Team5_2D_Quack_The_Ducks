@@ -44,5 +44,6 @@ public class Player_Manager : MonoBehaviour
     private void GoToMainMenuScene()
     {
         _sceneManager.GoToScene(0);
+        Setting_Manager.SETTING_MANAGER.ResetBGM();
     }
 }

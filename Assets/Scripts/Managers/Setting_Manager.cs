@@ -9,8 +9,8 @@ using UnityEngine.UI;
 
 public class Setting_Manager : MonoBehaviour
 {
-    private static Setting_Manager SETTING_MANAGER;
-    [SerializeField] private GameObject _audioMenu, _keyBindingMenu, _keyBindingMenuButton;
+    public static Setting_Manager SETTING_MANAGER;
+    [SerializeField] private GameObject _audioMenu, _keyBindingMenu, _keyBindingMenuButton, _mainMenuButton;
     [SerializeField] private AudioMixer _mixer;
     [SerializeField] private AudioSource _bgm;
     [SerializeField] Slider _bgmVolumeSlider;
@@ -33,7 +33,13 @@ public class Setting_Manager : MonoBehaviour
     private void Start()
     {
         ToggleSettingMenu(false);
+        _bgm.ignoreListenerPause = true;
         ResetBGM();
+
+        SetBgmVolume(_bgmVolumeSlider.value);
+        SetSfxVolume(_sfxVolumeSlider.value);
+        _sfxVolumeSlider.onValueChanged.AddListener(SetSfxVolume);
+        _bgmVolumeSlider.onValueChanged.AddListener(SetBgmVolume);
     }
 
 
@@ -47,9 +53,15 @@ public class Setting_Manager : MonoBehaviour
         }
 
         if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            _mainMenuButton.SetActive(false);
             _keyBindingMenuButton.SetActive(value);
+        }
         else
+        {
+            _mainMenuButton.SetActive(value);
             _keyBindingMenuButton.SetActive(false);
+        }
 
         _isInSetting = value;
         _audioMenu.SetActive(value);
@@ -57,12 +69,12 @@ public class Setting_Manager : MonoBehaviour
         if (value)
         {
             Time.timeScale = 0;
-            _bgm.Pause();
+            //_bgm.Pause();
         }
         else
         {
             Time.timeScale = 1f;
-            _bgm.UnPause();
+            //_bgm.UnPause();
         }
     }
     public void ToggleKeyBindingSettingMenu(bool value)
@@ -76,15 +88,13 @@ public class Setting_Manager : MonoBehaviour
         _audioMenu.SetActive(!value);
         _keyBindingMenu.SetActive(value);
     }
-    public void SetBgmVolume()
+    public void SetBgmVolume(float value)
     {
-        /* Replace NAME with corresponding string in Audio Mixer */
-        _mixer.SetFloat("NAME", _bgmVolumeSlider.value);    // Delete this comment if already replace **************
+        _mixer.SetFloat("Bgm", Mathf.Log10(value) * 20); 
     }
-    public void SetSfxVolume()
+    public void SetSfxVolume(float value)
     {
-        /* Replace NAME with corresponding string in Audio Mixer */
-        _mixer.SetFloat("NAME", _sfxVolumeSlider.value);    // Delete this comment if already replace **************
+        _mixer.SetFloat("Sfx", Mathf.Log10(value) * 20); 
     }
     public void ResetBGM()
     {

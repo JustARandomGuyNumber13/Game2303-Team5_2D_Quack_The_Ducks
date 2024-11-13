@@ -16,6 +16,7 @@ public class Player_Behavior : MonoBehaviour
     private Rigidbody2D _rb;
     private Transform _transform;
     private Collider2D _collider, _curPlatformStandOn;
+    private AudioSource _audio;
 
     private float _moveInput;
     private bool _isOnGround;
@@ -34,18 +35,22 @@ public class Player_Behavior : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _transform = transform;
         _collider = this.GetComponent<Collider2D>();
+        _audio = GetComponent<AudioSource>();
         _health = _stat._maxHealth;
     }
     private void Update()
     {
         _attackCoolDown += Time.deltaTime;
-        Move();
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         GroundCheck();
         if(collision.gameObject.tag == "Destroyer")
             DeactivatePlayer();
+    }
+    private void FixedUpdate()
+    {
+        Move();
     }
 
 
@@ -84,7 +89,7 @@ public class Player_Behavior : MonoBehaviour
     }
     private void GroundCheck()
     {
-        RaycastHit2D hit = Physics2D.Raycast(_transform.position, Vector2.down, _groundCheckDistance, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.BoxCast(_transform.position + Vector3.down * 0.5f, Vector2.one * 0.6f, 0, Vector3.down, _groundCheckDistance, LayerMask.GetMask("Ground"));
         if (hit.collider != null)
         {
             _curPlatformStandOn = hit.collider;
@@ -92,6 +97,7 @@ public class Player_Behavior : MonoBehaviour
             _isSecondJump = false;
             _anim.SetBool("onGround", true);
         }
+
     }
 
 
@@ -128,6 +134,7 @@ public class Player_Behavior : MonoBehaviour
     }
     private void Attack()
     {
+        _audio.Play();
         int facingDir = (int)_transform.localScale.x;
         Vector3 hitPos = _transform.position + Vector3.right * _stat._attackRange / 2 * facingDir;
         Collider2D[] hit = Physics2D.OverlapCircleAll(hitPos, _stat._attackRange/2, LayerMask.GetMask("Duck"));

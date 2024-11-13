@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: New Player_Stat
   m_EditorClassIdentifier: 
   maxHealth: 8
-  moveSpeed: 5
+  moveSpeed: 6
   jumpForce: 11
   attackCooldown: 0.3
-  accelerationSpeed: 5
+  accelerationSpeed: 30
   attackRange: 1.5
   bounceBackForce: 5
