@@ -118,7 +118,7 @@ public class Enemy_Behavior : MonoBehaviour
             _currentWayPoint++;
 
         if(_targetTransform.position.y < -3)
-            _rb.velocity = Vector2.up * _rb.velocity.y;
+            _rb.linearVelocity = Vector2.up * _rb.linearVelocity.y;
 
         FaceDirection();
     }
@@ -162,7 +162,7 @@ public class Enemy_Behavior : MonoBehaviour
     private void FaceDirection()
     {
         Vector3 curScale = _transform.localScale;
-        curScale.x = _rb.velocity.x > 0 ? 1 : -1;
+        curScale.x = _rb.linearVelocity.x > 0 ? 1 : -1;
         _transform.localScale = curScale;
     }
 
@@ -182,7 +182,7 @@ public class Enemy_Behavior : MonoBehaviour
     { 
         // Push enemy back against "other" direction
         Vector3 bounceBackDir = _transform.position - other.position;
-        _rb.velocity = Vector2.up * _rb.velocity.y; // Reset velocity x
+        _rb.linearVelocity = Vector2.up * _rb.linearVelocity.y; // Reset velocity x
         _rb.AddForce(bounceBackDir * _stat._bounceBackForce, ForceMode2D.Impulse);
     }
     private void DieEffect()
@@ -198,13 +198,13 @@ public class Enemy_Behavior : MonoBehaviour
                         _playerBehaviors[i].TakeDamage(0, _transform);
                     }
         }
-        _rb.velocity = Vector2.right;
+        _rb.linearVelocity = Vector2.right;
         FaceDirection();
         _enemySprite.SetActive(false);
         _explosionSprite.SetActive(true);
         _isAlive = false;
         _collider.enabled = false;
-        _rb.velocity = Vector2.zero;
+        _rb.linearVelocity = Vector2.zero;
         _rb.gravityScale = 0;
         Invoke("DeactivateEnemy", 0.5f);
     }

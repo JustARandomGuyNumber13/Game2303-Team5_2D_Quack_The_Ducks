@@ -52,8 +52,8 @@ public class Player_Behavior : MonoBehaviour
     /* Movement handlers */
     private void Move()
     {
-        float xSpeed = Mathf.MoveTowards(_rb.velocity.x, _stat._moveSpeed * _moveInput, _stat._accelerationSpeed * Time.fixedDeltaTime);
-        _rb.velocity = Vector2.right * xSpeed + Vector2.up * _rb.velocity.y;
+        float xSpeed = Mathf.MoveTowards(_rb.linearVelocity.x, _stat._moveSpeed * _moveInput, _stat._accelerationSpeed * Time.fixedDeltaTime);
+        _rb.linearVelocity = Vector2.right * xSpeed + Vector2.up * _rb.linearVelocity.y;
     }
     private void Jump()
     {
@@ -62,7 +62,7 @@ public class Player_Behavior : MonoBehaviour
             if (!_isOnGround) 
                 _isSecondJump = true;
 
-            _rb.velocity = _rb.velocity - _rb.velocity.y * Vector2.up;  // Reset y velocity
+            _rb.linearVelocity = _rb.linearVelocity - _rb.linearVelocity.y * Vector2.up;  // Reset y velocity
             _rb.AddForce(Vector2.up * _stat._jumpForce, ForceMode2D.Impulse);
             _anim.SetTrigger("jump");
             _anim.SetBool("onGround", false);
@@ -107,7 +107,7 @@ public class Player_Behavior : MonoBehaviour
     private void HurtEffect(Transform other)
     {
         Vector3 bounceBackDir = _transform.position - other.position;
-        _rb.velocity = Vector2.up * _rb.velocity.y; // Reset velocity x
+        _rb.linearVelocity = Vector2.up * _rb.linearVelocity.y; // Reset velocity x
         _rb.AddForce(bounceBackDir * _stat._bounceBackForce, ForceMode2D.Impulse);
     }
     private void Die()

@@ -36,7 +36,7 @@
                     "name": "Attack",
                     "type": "Button",
                     "id": "9ac60f1c-aea5-4339-a50f-a115aa00f6d3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -102,6 +102,17 @@
                     "name": "",
                     "id": "73c302e1-1993-4abf-b570-75e5bfc267ad",
                     "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6bdd09d8-7cef-4785-abf9-56899c28cc4c",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
